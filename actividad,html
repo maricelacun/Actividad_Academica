@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro Actividades · Tercero Bachillerato</title>
+  <!-- Font Awesome (iconos) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- LOADER -->
+  <div id="loader" class="loader-overlay">
+    <div class="loader-spinner"></div>
+    <p>Cargando sistema...</p>
+  </div>
+
+  <div class="app-wrapper" style="display:none;">
+    <!-- ENCABEZADO -->
+    <header class="header">
+      <div class="header-top">
+        <div>
+          <h1><i class="fas fa-graduation-cap" style="color: #f9a825;"></i> UNIDAD EDUCATIVA</h1>
+          <p class="subtitle">Sistema para Registro de Actividades Educativas</p>
+        </div>
+        <div class="header-meta">
+          <div><i class="fas fa-user-tie"></i> Docente: <span id="docenteDisplay">___________________</span></div>
+          <div><i class="fas fa-calendar-alt"></i> <span id="fechaDisplay"></span></div>
+          <div><i class="fas fa-clock"></i> <span id="horaDisplay"></span></div>
+        </div>
+      </div>
+    </header>
+
+    <!-- MENÚ SUPERIOR -->
+    <nav class="top-menu">
+      <button class="menu-btn active" data-section="inicio"><i class="fas fa-home"></i> Inicio</button>
+      <button class="menu-btn" data-section="registro"><i class="fas fa-clipboard-list"></i> Registro</button>
+      <button class="menu-btn" data-section="estadisticas"><i class="fas fa-chart-bar"></i> Estadísticas</button>
+      <button class="menu-btn" data-section="exportar"><i class="fas fa-file-export"></i> Exportar</button>
+      <button class="menu-btn" data-section="configuracion"><i class="fas fa-cog"></i> Configuración</button>
+    </nav>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="main-content">
+      <!-- SECCIÓN INICIO (Dashboard) -->
+      <section id="seccion-inicio" class="section active">
+        <h2><i class="fas fa-chart-pie"></i> Resumen rápido</h2>
+        <div class="dashboard-cards" id="resumenCards">
+          <div class="stat-card"><i class="fas fa-users"></i> <span id="totalEstudiantes">0</span> <small>Estudiantes</small></div>
+          <div class="stat-card"><i class="fas fa-user-check"></i> <span id="participaronHoy">0</span> <small>Participaron</small></div>
+          <div class="stat-card"><i class="fas fa-chalkboard-teacher"></i> <span id="expusieronHoy">0</span> <small>Expusieron</small></div>
+          <div class="stat-card"><i class="fas fa-file-alt"></i> <span id="entregaronTarea">0</span> <small>Entregaron tarea</small></div>
+          <div class="stat-card"><i class="fas fa-user-slash"></i> <span id="faltaronHoy">0</span> <small>Faltaron</small></div>
+        </div>
+        <div style="display:flex; flex-wrap:wrap; gap:20px; margin-top:20px;">
+          <div style="flex:2; min-width:300px; background:white; border-radius:20px; padding:15px; box-shadow:0 8px 20px rgba(0,0,0,0.05);">
+            <canvas id="barChart" height="150"></canvas>
+          </div>
+          <div style="flex:1; min-width:200px; background:white; border-radius:20px; padding:15px; box-shadow:0 8px 20px rgba(0,0,0,0.05);">
+            <canvas id="pieChart" height="150"></canvas>
+          </div>
+        </div>
+        <div style="margin-top:20px; background:white; border-radius:20px; padding:15px; box-shadow:0 8px 20px rgba(0,0,0,0.05);">
+          <h4><i class="fas fa-trophy"></i> Ranking</h4>
+          <ul id="rankingList" style="list-style:none; padding:0;"></ul>
+        </div>
+      </section>
+
+      <!-- SECCIÓN REGISTRO -->
+      <section id="seccion-registro" class="section" style="display:none;">
+        <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:20px;">
+          <div>
+            <button class="tab-btn active" data-paralelo="A">PARALELO A</button>
+            <button class="tab-btn" data-paralelo="B">PARALELO B</button>
+          </div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <input type="text" id="buscador" placeholder="🔍 Buscar estudiante..." style="padding:10px 16px; border-radius:40px; border:1px solid #ccc;">
+            <select id="filtroActividad" style="padding:10px 16px; border-radius:40px; border:1px solid #ccc;">
+              <option value="todos">Todos</option>
+              <option value="con-actividad">Con actividad</option>
+              <option value="sin-actividad">Sin actividad</option>
+              <option value="con-obs">Con observaciones</option>
+              <option value="mayor-puntaje">Mayor puntaje</option>
+              <option value="menor-puntaje">Menor puntaje</option>
+            </select>
+          </div>
+        </div>
+        <div id="listaEstudiantes" class="student-grid"></div>
+      </section>
+
+      <!-- SECCIÓN ESTADÍSTICAS -->
+      <section id="seccion-estadisticas" class="section" style="display:none;">
+        <h2><i class="fas fa-chart-line"></i> Estadísticas detalladas</h2>
+        <div class="dashboard-cards" id="statsCards">
+          <div class="stat-card"><i class="fas fa-users"></i> <span id="statTotal">0</span> <small>Total</small></div>
+          <div class="stat-card"><i class="fas fa-user-check"></i> <span id="statParticiparon">0</span> <small>Participaron</small></div>
+          <div class="stat-card"><i class="fas fa-chalkboard-teacher"></i> <span id="statExpusieron">0</span> <small>Expusieron</small></div>
+          <div class="stat-card"><i class="fas fa-file-alt"></i> <span id="statEntregaron">0</span> <small>Entregaron</small></div>
+          <div class="stat-card"><i class="fas fa-user-slash"></i> <span id="statFaltaron">0</span> <small>Faltaron</small></div>
+          <div class="stat-card"><i class="fas fa-calculator"></i> <span id="statPromedio">0</span> <small>Promedio</small></div>
+        </div>
+        <div style="display:flex; flex-wrap:wrap; gap:20px; margin-top:20px;">
+          <div style="flex:1; min-width:250px; background:white; border-radius:20px; padding:15px;">
+            <canvas id="lineChart" height="150"></canvas>
+          </div>
+          <div style="flex:1; min-width:250px; background:white; border-radius:20px; padding:15px;">
+            <canvas id="pieStatsChart" height="150"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECCIÓN EXPORTAR -->
+      <section id="seccion-exportar" class="section" style="display:none;">
+        <h2><i class="fas fa-file-export"></i> Exportar datos</h2>
+        <div style="display:flex; gap:15px; flex-wrap:wrap;">
+          <button class="btn-export" onclick="exportarExcel()"><i class="fas fa-file-excel"></i> Excel</button>
+          <button class="btn-export" onclick="exportarCSV()"><i class="fas fa-file-csv"></i> CSV</button>
+          <button class="btn-export" onclick="exportarPDF()"><i class="fas fa-file-pdf"></i> PDF</button>
+        </div>
+        <p style="margin-top:20px; color:#555;">Se exportarán todos los registros del paralelo activo.</p>
+      </section>
+
+      <!-- SECCIÓN CONFIGURACIÓN -->
+      <section id="seccion-configuracion" class="section" style="display:none;">
+        <h2><i class="fas fa-sliders-h"></i> Configuración de puntajes</h2>
+        <div id="configPuntajes" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:10px; background:white; padding:20px; border-radius:20px;"></div>
+        <button class="btn-primary" style="margin-top:20px;" onclick="guardarConfiguracion()"><i class="fas fa-save"></i> Guardar configuración</button>
+        <button class="btn-danger" style="margin-top:10px;" onclick="reiniciarRegistros()"><i class="fas fa-undo-alt"></i> Reiniciar registros</button>
+      </section>
+    </main>
+  </div>
+
+  <!-- MODAL -->
+  <div id="modalActividad" class="modal">
+    <div class="modal-content">
+      <span class="close-modal" id="closeModal">&times;</span>
+      <h3 id="modalEstudiante">Registrar actividad</h3>
+      <div id="actividadesCheckboxes" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:8px; margin:15px 0;"></div>
+      <div style="margin:15px 0;">
+        <label><i class="fas fa-pen"></i> Observaciones</label>
+        <textarea id="modalObservaciones" rows="3" placeholder="Escribe observaciones..." style="width:100%; padding:10px; border-radius:12px; border:1px solid #ddd;"></textarea>
+      </div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+        <span><strong>Puntaje día:</strong> <span id="modalPuntajeDia">0</span></span>
+        <span><strong>Puntaje acumulado:</strong> <span id="modalPuntajeAcumulado">0</span></span>
+        <button class="btn-primary" id="guardarActividadBtn"><i class="fas fa-save"></i> Guardar</button>
+        <button class="btn-secondary" id="limpiarFormBtn"><i class="fas fa-eraser"></i> Limpiar</button>
+        <button class="btn-danger" id="eliminarRegistroBtn"><i class="fas fa-trash"></i> Eliminar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div id="toast" class="toast"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
